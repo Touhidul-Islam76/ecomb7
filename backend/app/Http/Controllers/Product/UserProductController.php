@@ -35,6 +35,7 @@ class UserProductController extends Controller
             return $this->error(['This product is not in your wishlist']);
         }
 
+        // wishlist deleted
         $productWishliSt->delete();
         return $this->success(null, ['Product Successfully removed from your wishlist']);
     }
