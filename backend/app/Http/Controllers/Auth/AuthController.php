@@ -21,6 +21,11 @@ class AuthController extends Controller
                 'otp' => $otp,
             ]);
         }
+        else{
+            $user->update([
+                'otp' => $otp,
+            ]);
+        }
 
         Mail::raw('Your OTP is:'.$otp, function($msg) use($req){
             $msg->to($req->email)->subject('login otp');
