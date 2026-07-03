@@ -17,7 +17,7 @@ class AuthController extends Controller
 
         if(!$user){
             User::create([
-                'email' => '$req->email',
+                'email' => $req->email,
                 'otp' => $otp,
             ]);
         }
