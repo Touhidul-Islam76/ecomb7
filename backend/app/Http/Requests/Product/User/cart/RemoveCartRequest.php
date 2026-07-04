@@ -5,7 +5,7 @@ namespace App\Http\Requests\Product\User\cart;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddCartRequest extends FormRequest
+class RemoveCartRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,7 @@ class AddCartRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|numeric|min:1',
-            'size' => 'nullable|string|max:12',
-            'color' => 'nullable|string|max:32',
+            'cart_id' => 'required|exists:product_carts,id',
         ];
     }
 }
