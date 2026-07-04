@@ -25,10 +25,19 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('products', [ProductController::class, 'index']);
 
     Route::group(['middleware' => 'auth:sanctum'], function () {
+        // wishlist route
         Route::group(['prefix' => 'wishlist'], function () {
             Route::post('add', [UserProductController::class, 'addWishlist'])->name('add');
             Route::post('delete', [UserProductController::class, 'deleteWishlist'])->name('delete');
             Route::get('/', [UserProductController::class, 'showWishlist']);
+        });
+
+        // cart route
+        Route::group(['prefix' => 'cart'], function(){
+            Route::get('/', [UserProductController::class, 'cartIndex']);
+            Route::post('add', [UserProductController::class, 'addCart'])->name('add');
+            Route::post('delete', [UserProductController::class, 'removeCart'])->name('delete');
+            Route::post('flush', [UserProductController::class, 'flushCart'])->name('flush');
         });
     });
 });
