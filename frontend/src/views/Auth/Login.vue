@@ -22,7 +22,7 @@
           </div>
         </div>
         {{ auth.message }}
-        <button :disabled="auth.sending" @click="send" class="btn btn-secondary">
+        <button :disabled="auth.sending" @click.prevent="send" class="btn btn-secondary">
           {{ auth.sending ? "sending" : "sent otp" }}
         </button>
       </form>
@@ -42,15 +42,16 @@
               required
 
               inputmode="numeric"
-
+              v-model = "otp"
               placeholder="4-digit code" 
               class="custom-input otp-input"
             />
           </div>
         </div>
-        <button  class="btn btn-primary">
+        <button @click.prevent="verify"  class="btn btn-primary">
           Verify & Login
         </button>
+        {{ auth.message }}
       </form>
     </div>
   </div>
@@ -62,11 +63,15 @@ import { useAuth } from '../../stores/auth';
 
 const auth = useAuth();
 const email = ref(auth.email || '');
-const otp = ref();
+const otp = ref(auth.otp || '');
 
 
 const send = () => {
   auth.sendOtp(email.value);
+}
+
+const verify = () =>{
+  auth.verifyOtp(otp.value);
 }
 
 </script>
