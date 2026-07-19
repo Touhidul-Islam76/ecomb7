@@ -34,10 +34,15 @@
                                 <li><a href="compare.html"><i class="ti-control-shuffle"></i><span>Compare</span></a>
                                 </li>
                                 <li><a href="wishlist.html"><i class="ti-heart"></i><span>Wishlist</span></a></li>
-                                <li>
+                                <li v-if="!auth.isAuthenticated">
                                     <router-link to="/login">
-                                        <i class="ti-user"></i><span>Login</span>
+                                        <i class="ti-shift-right"></i><span>Login</span>
                                     </router-link>
+                                </li>
+                                <li v-if="auth.isAuthenticated">
+                                    <button @click.prevent="logout">
+                                        <i class="ti-user"></i><span>Logout</span>
+                                    </button>
                                 </li>
                             </ul>
                         </div>
@@ -90,7 +95,8 @@
                                         <li><a class="dropdown-item nav-link nav_item" href="faq.html">Faq</a></li>
                                         <li><a class="dropdown-item nav-link nav_item" href="404.html">404 Error
                                                 Page</a></li>
-                                        <li><a class="dropdown-item nav-link nav_item" href="login.html">Login</a></li>
+                                        <li v-if="!auth.isAuthenticated"><a class="dropdown-item nav-link nav_item"
+                                                href="login.html">Login</a></li>
                                         <li><a class="dropdown-item nav-link nav_item" href="signup.html">Register</a>
                                         </li>
                                         <li><a class="dropdown-item nav-link nav_item" href="term-condition.html">Terms
@@ -414,4 +420,20 @@
 </template>
 
 <script setup>
+import { useAuth } from '../../stores/auth';
+import Toastify from 'toastify-js';
+
+const auth = useAuth();
+// const message = auth.message;
+const logout = () => {
+    auth.logout();
+    Toastify({
+
+        text: auth.message,
+
+        duration: 3000
+
+    }).showToast();
+}
+
 </script>
