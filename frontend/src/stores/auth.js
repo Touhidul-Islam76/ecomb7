@@ -32,8 +32,8 @@ export const useAuth = defineStore("auth", {
           
 
           // getting message from response
-          const apiMessage = response.massage || response.data?.massage;
-
+          const apiMessage = response.data.data.massage ;
+ 
           if (Array.isArray(apiMessage)) {
             this.message = apiMessage[0];
           } else {
@@ -65,7 +65,23 @@ export const useAuth = defineStore("auth", {
           this.access_token = response.data.data.accessToken;
           localStorage.setItem("access_token", this.access_token);
 
-          this.message = "Login success";
+          // this.message = "Login success";
+                    // getting message from response
+          const apiMessage = response.massage || response.data?.massage;
+
+          if (Array.isArray(apiMessage)) {
+            this.message = apiMessage[0];
+          } else {
+            this.message = "OTP Sent Successfully";
+          }
+
+
+          // re-directing to the dashboard page after 1.2 seconds  
+          setTimeout(() => {
+            router.push('/dashboard/my-account')
+          },1200);
+
+          
 
           // will be redirected to dashboard after login
           // router.push({ name: 'Dashboard' });
@@ -77,6 +93,16 @@ export const useAuth = defineStore("auth", {
       } finally {
         this.verifying = false;
       }
+    },
+    logout(){
+      localStorage.removeItem("access_token", this.access_token);
+      this.access_token = null;
+      this.message = "Logout successful";
+
+      setTimeout(() => {
+        router.push("/login");
+      }, 1200);
+
     },
   },
 });
