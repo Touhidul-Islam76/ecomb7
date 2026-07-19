@@ -11,14 +11,8 @@
           <label for="email">Email Address</label>
           <div class="input-wrapper">
             <span class="input-icon">✉</span>
-            <input 
-              id="email"
-              type="email" 
-              required
-              v-model="email"
-              placeholder="you@example.com" 
-              class="custom-input"
-            />
+            <input id="email" type="email" required v-model="email" placeholder="you@example.com"
+              class="custom-input" />
           </div>
         </div>
         {{ auth.message }}
@@ -31,24 +25,16 @@
         <span>Verification</span>
       </div>
 
-      <form  class="form-section">
+      <form class="form-section">
         <div class="input-group">
           <label for="otp">Enter OTP</label>
           <div class="input-wrapper">
             <span class="input-icon">🔑</span>
-            <input 
-              id="otp"
-              type="text" 
-              required
-
-              inputmode="numeric"
-              v-model = "otp"
-              placeholder="4-digit code" 
-              class="custom-input otp-input"
-            />
+            <input id="otp" type="text" required inputmode="numeric" v-model="otp" placeholder="4-digit code"
+              class="custom-input otp-input" />
           </div>
         </div>
-        <button @click.prevent="verify"  class="btn btn-primary">
+        <button @click.prevent="verify" class="btn btn-primary">
           Verify & Login
         </button>
         {{ auth.message }}
@@ -60,24 +46,40 @@
 <script setup>
 import { ref } from 'vue';
 import { useAuth } from '../../stores/auth';
+import Toastify from 'toastify-js';
 
 const auth = useAuth();
 const email = ref(auth.email || '');
 const otp = ref(auth.otp || '');
 
 
+
 const send = () => {
   auth.sendOtp(email.value);
+    Toastify({
+
+    text: auth.message,
+
+    duration: 3000
+
+  }).showToast();
 }
 
-const verify = () =>{
+const verify = () => {
   auth.verifyOtp(otp.value);
+  Toastify({
+
+    text: 'otp verified',
+
+    duration: 3000
+
+  }).showToast();
+  console.log(auth.message);
 }
 
 </script>
 
 <style scoped>
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 .login-wrapper {
@@ -254,7 +256,7 @@ const verify = () =>{
   .form-card {
     padding: 30px 20px;
   }
-  
+
   .card-header h2 {
     font-size: 22px;
   }
