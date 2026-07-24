@@ -71,7 +71,8 @@
                             <div class="tab-pane fade show active" id="arrival" role="tabpanel"
                                 aria-labelledby="arrival-tab">
                                 <div class="row shop_container">
-                                    <div v-for="product in allProducts" :key="product.id" class="col-lg-3 col-md-4 col-6">
+                                    <div v-for="product in allProducts" :key="product.id"
+                                        class="col-lg-3 col-md-4 col-6">
                                         <div class="product">
                                             <div class="product_img">
                                                 <a href="shop-product-detail.html">
@@ -86,12 +87,14 @@
                                                                     class="icon-shuffle"></i></a></li> -->
                                                         <li><a href="shop-quick-view.html" class="popup-ajax"><i
                                                                     class="icon-magnifier-add"></i></a></li>
-                                                        <li><a href="#"><i class="icon-heart"></i></a></li>
+                                                        <li><a href="#" @click.prevent="addWishlist(product.id)"><i
+                                                                    class="icon-heart"></i></a></li>
                                                     </ul>
                                                 </div>
                                             </div>
                                             <div class="product_info">
-                                                <h6 class="product_title"><a href="shop-product-detail.html">{{ product.title }}</a></h6>
+                                                <h6 class="product_title"><a href="shop-product-detail.html">{{
+                                                        product.title }}</a></h6>
                                                 <div class="product_price">
                                                     <span class="price">${{ product.price }}</span>
                                                     <del>$55.25</del>
@@ -2149,12 +2152,42 @@
 import { productStore } from '../stores/Product/productStore';
 import { onMounted, ref } from 'vue';
 import http from '../library/http';
+import { useAuth } from '../stores/auth';
+import Toastify from 'toastify-js';
+import { useRouter } from 'vue-router';
 
 const productStores = productStore();
+const auth = useAuth();
+const router = useRouter();
 const allProducts = ref([]);
 
-onMounted(async() => {
+onMounted(async () => {
     allProducts.value = await productStores.getProduct();
     console.log(allProducts);
 });
+
+const addWishlist = async(productId) => {
+    if (!auth.isAuthenticated) {
+        Toastify({
+
+            text: "You have to login first to add wishlist",
+
+            duration: 3000
+
+        }).showToast();
+
+
+        setTimeout(()=>{
+        router.push('/login');        
+        },1500);
+
+    }else{
+        const wishlistResponse = await http.post('wishlist/add',{
+            product_id: productId,
+        })
+
+        console.log(wishlistResponse);
+    }
+}
+
 </script>
