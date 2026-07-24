@@ -63,6 +63,16 @@ class UserProductController extends Controller
         return $this->success($allWishlist, ['All wishlist retrieved successfully']);
     }
 
+    // wishlist flush
+    public function flushWishlist(){
+        $deletedWishlist = ProductWishList::whereUserId(auth()->id())->delete();
+        if(!$deletedWishlist){
+            return $this->error(['You have not added any product in your wishlist']);
+        }else{
+            return $this->success(null, ['All wishlist cleared successfully']);
+        }
+    }
+
 
     // cart index
     public function cartIndex()

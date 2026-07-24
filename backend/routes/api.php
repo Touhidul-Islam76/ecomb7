@@ -31,6 +31,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('add', [UserProductController::class, 'addWishlist'])->name('add');
             Route::post('delete', [UserProductController::class, 'deleteWishlist'])->name('delete');
             Route::get('/', [UserProductController::class, 'showWishlist']);
+            ROute::post('flush', [UserProductController::class, 'flushWishlist']);
         });
 
         // cart route
