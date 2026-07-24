@@ -4,6 +4,7 @@ import Profile from "../views/Profile.vue";
 import Home from "../views/Home.vue";
 import MyAccount from "../views/dashboard/MyAccount.vue";
 import { useAuth } from "../stores/auth.js";
+import Wishlist from "../views/dashboard/Wishlist.vue";
 
 
 // defining the routes where components will be shown
@@ -16,6 +17,12 @@ const routes = [
     path: "/login",
     name:'login',
     component: Login,
+  },
+  {
+    path:"/wishlist",
+    component: Wishlist,
+    // this meta:{ requireAuth:true } is for that page which is secured and accesable only for the logged in users  
+    meta: { requireAuth:true }
   },
   {
     path: "/profile",
