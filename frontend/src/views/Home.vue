@@ -2186,7 +2186,15 @@ const addWishlist = async(productId) => {
             product_id: productId,
         })
 
-        console.log(wishlistResponse);
+        Toastify({
+
+            text: wishlistResponse.data.massage[0],
+
+            duration: 3000
+
+        }).showToast();        
+
+
     }
 }
 
