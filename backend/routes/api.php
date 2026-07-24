@@ -23,6 +23,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('brands', [BrandController::class, 'index']);
     Route::get('categories', [CategoryController::class, 'index']);
     Route::get('products', [ProductController::class, 'index']);
+    Route::post('products', [ProductController::class, 'show']);
 
     Route::group(['middleware' => 'auth:sanctum'], function () {
         // wishlist route
