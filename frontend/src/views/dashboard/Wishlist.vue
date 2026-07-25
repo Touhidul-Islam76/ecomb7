@@ -1,61 +1,5 @@
 <template>
   <div class="wishlist-page">
-    <!-- Top Header -->
-    <!-- <div class="top-header">
-      <div class="container top-header-content">
-        <div class="top-header-left">
-          <select v-model="selectedLanguage">
-            <option value="en">English</option>
-            <option value="bn">Bangla</option>
-          </select>
-          <select v-model="selectedCurrency">
-            <option value="USD">USD</option>
-            <option value="BDT">BDT</option>
-          </select>
-          <span><i class="fa-solid fa-phone"></i> 123-456-7890</span>
-        </div>
-        <div class="top-header-right">
-          <a href="#"><i class="fa-solid fa-code-compare"></i> Compare</a>
-          <a href="#"><i class="fa-regular fa-heart"></i> Wishlist</a>
-          <a href="#"><i class="fa-solid fa-user"></i> Account</a>
-        </div>
-      </div>
-    </div> -->
-
-
-    <!-- Main Navigation Bar -->
-    <!-- <nav class="navbar">
-      <div class="container navbar-content">
-        <router-link to="/" class="logo">
-          <i class="fa-solid fa-shopping-bag logo-icon"></i>
-          Shopwise
-        </router-link>
-
-        <ul class="nav-menu">
-          <li><router-link to="/" class="nav-link">Home</router-link></li>
-          <li><a href="#" class="nav-link">Pages</a></li>
-          <li><a href="#" class="nav-link">Products</a></li>
-          <li><a href="#" class="nav-link">Blog</a></li>
-          <li><a href="#" class="nav-link">Shop</a></li>
-          <li><a href="#" class="nav-link">Contact Us</a></li>
-        </ul>
-
-        <div class="nav-icons">
-          <div class="icon-btn" title="Search">
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </div>
-          <div class="icon-btn" title="Wishlist">
-            <i class="fa-regular fa-heart"></i>
-            <span class="badge" v-if="wishlist.length > 0">{{ wishlist.length }}</span>
-          </div>
-          <div class="icon-btn" title="Cart">
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span class="badge">{{ cartCount }}</span>
-          </div>
-        </div>
-      </div>
-    </nav> -->
-
     <!-- Breadcrumb Section -->
     <div class="breadcrumb-section">
       <div class="container breadcrumb-content">
@@ -68,95 +12,90 @@
       </div>
     </div>
 
-    <!-- Main Content: Wishlist -->
-    <main class="container">
-      <div class="wishlist-wrapper">
-        
-        <!-- Loading State -->
-        <!-- <div v-if="isLoading" class="loading-spinner">
-          <i class="fa-solid fa-spinner fa-spin"></i>
-          <p>Loading your wishlist...</p>
-        </div> -->
+<!-- Main Content: Wishlist -->
+<main class="container">
+  <div class="wishlist-wrapper">
+    
+    <!-- Table View when Items exist -->
+    <div v-if="wishlists.length > 0">
+      <div class="wishlist-table-container">
+        <table class="wishlist-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Unit Price</th>
+              <th>Stock Status</th>
+              <th>Action</th>
+              <th>Remove</th>
+            </tr>
+          </thead>
 
-        <!-- Table View when Items exist -->
-        <div>
-          <div class="wishlist-table-container">
-            <table class="wishlist-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Unit Price</th>
-                  <th>Stock Status</th>
-                  <th>Action</th>
-                  <th>Remove</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr v-for="item in wishlists" :key="item.product.id">
-                  <td>
-                    <div class="product-col">
-                      <img :src="item.product.image" :alt="item.product.title" class="product-img" />
-                      <a href="#" class="product-title">{{ item.product.title }}</a>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="price-current">${{item.product.price}}</span>
-                    <!-- <span v-if="item.oldPrice" class="price-old">${{ item.oldPrice.toFixed(2) }}</span> -->
-                  </td>
-                  <td>
-                    <span 
-                      class="stock-badge" 
-                      :class="item.inStock ? 'stock-in' : 'stock-out'"
-                    >
-                      {{ item.inStock ? 'In Stock' : 'Out of Stock' }}
-                    </span>
-                  </td>
-                  <td>
-                    <button 
-                      v-if="item.inStock"
-                      class="btn btn-primary"
-                      @click="addToCart(item)"
-                      :disabled="isProcessing"
-                    >
-                      <i class="fa-solid fa-cart-shopping"></i> Add to Cart
-                    </button>
-                    <button v-else class="btn btn-disabled" disabled>
-                      <i class="fa-solid fa-cart-shopping"></i> Out of Stock
-                    </button>
-                  </td>
-                  <td>
-                    <button 
-                      class="action-remove" 
-                      @click="removeFromWishlist(item.id)" 
-                      title="Remove Item"
-                    >
-                      <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                  </td>
-
-                </tr>
-
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Actions Footer -->
-          <div class="wishlist-actions">
-            <router-link to="/shop" class="btn btn-outline">
-              <i class="fa-solid fa-arrow-left"></i> Continue Shopping
-            </router-link>
-            <button @click.prevent="flush" class="btn btn-outline" @click="clearWishlist">
-              <i class="fa-solid fa-trash"></i> Clear Wishlist
-            </button>
-          </div>
-        </div>
-
-
-
-
+          <tbody>
+            <tr v-for="item in wishlists" :key="item.product.id">
+              <td>
+                <div class="product-col">
+                  <img :src="item.product.image" :alt="item.product.title" class="product-img" />
+                  <a href="#" class="product-title">{{ item.product.title }}</a>
+                </div>
+              </td>
+              <td>
+                <span class="price-current">${{ item.product.price }}</span>
+              </td>
+              <td>
+                <span 
+                  class="stock-badge" 
+                  :class="item.inStock ? 'stock-in' : 'stock-out'"
+                >
+                  {{ item.inStock ? 'In Stock' : 'Out of Stock' }}
+                </span>
+              </td>
+              <td>
+                <button 
+                  v-if="item.inStock"
+                  class="btn btn-primary"
+                  @click="addToCart(item)"
+                  :disabled="isProcessing"
+                >
+                  <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                </button>
+                <button v-else class="btn btn-disabled" disabled>
+                  <i class="fa-solid fa-cart-shopping"></i> Out of Stock
+                </button>
+              </td>
+              <td>
+                <button 
+                  class="action-remove" 
+                  @click="removeFromWishlist(item.product.id)" 
+                  title="Remove Item"
+                >
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </main>
+
+      <!-- Actions Footer -->
+      <div class="wishlist-actions">
+        <router-link to="/shop" class="btn btn-outline">
+          <i class="fa-solid fa-arrow-left"></i> Continue Shopping
+        </router-link>
+        <button class="btn btn-outline" @click="flush">
+          <i class="fa-solid fa-trash"></i> Clear Wishlist
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty View when No Items exist -->
+    <div v-else class="empty-wishlist">
+      <i class="fa-regular fa-heart"></i>
+      <h3>You haven't added any product in your wishlist yet.</h3>
+
+    </div>
+
+  </div>
+</main>
 
     <!-- Footer -->
 
@@ -231,6 +170,39 @@ const flush = async() =>{
         router.push('/');
     }
 }
+
+const removeFromWishlist = async (wishlistId) => {
+  if (!auth.isAuthenticated) {
+    Toastify({
+      text: "Something Unauthenticated issue has been noticed",
+      duration: 3000
+    }).showToast();
+    return;
+  }
+
+  try {
+    const deleteWishlist = await http.post('wishlist/delete', {
+      product_id: wishlistId,
+    });
+
+    if (deleteWishlist) {
+      // removing product from list without reload 
+      wishlists.value = wishlists.value.filter(item => item.id !== wishlistId);
+
+      // showing success message
+      Toastify({
+        text: deleteWishlist.data.massage || "Item removed successfully",
+        duration: 3000
+      }).showToast();
+    }
+  } catch (error) {
+    console.error("Error removing item:", error);
+    Toastify({
+      text: "Failed to remove item from wishlist",
+      duration: 3000
+    }).showToast();
+  }
+};
 </script>
 
 <style scoped>
