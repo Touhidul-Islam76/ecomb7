@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import http from "../library/http";
 import router from "../router";
+import { cartStore } from "./Product/cartStore";
+import { useWishlistStore } from "./wishlistStore";
 
 export const useAuth = defineStore("auth", {
   state: () => ({
@@ -77,6 +79,26 @@ export const useAuth = defineStore("auth", {
 
 
           // re-directing to the dashboard page after 1.2 seconds  
+          // refresh other stores (cart, wishlist) so UI immediately reflects logged-in state
+          try {
+            const cstore = cartStore();
+            if (cstore) {
+              // cstore.access_token = this.access_token;
+              await cstore.allCarts();
+            }
+          } catch (e) {
+            console.error('Failed to refresh cart store after login', e);
+          }
+
+          try {
+            const wstore = useWishlistStore();
+            if (wstore && typeof wstore.fetchAll === 'function') {
+              await wstore.fetchAll();
+            }
+          } catch (e) {
+            console.error('Failed to refresh wishlist store after login', e);
+          }
+
           setTimeout(() => {
             router.push('/dashboard/my-account')
           },1200);
@@ -95,9 +117,31 @@ export const useAuth = defineStore("auth", {
       }
     },
     logout(){
-      localStorage.removeItem("access_token", this.access_token);
+      // remove token
+      localStorage.removeItem("access_token");
       this.access_token = null;
       this.message = "Logout successful";
+
+      // clear cart store state so UI updates immediately after logout
+      try {
+        const cstore = cartStore();
+        if (cstore) {
+          cstore.allCart = [];
+          cstore.access_token = null;
+        }
+      } catch (e) {
+        console.error('Failed to clear cart store on logout', e);
+      }
+
+      // clear wishlist store state as well
+      try {
+        const wstore = useWishlistStore();
+        if (wstore) {
+          wstore.wishlists = [];
+        }
+      } catch (e) {
+        console.error('Failed to clear wishlist store on logout', e);
+      }
 
       setTimeout(() => {
         router.push("/login");
