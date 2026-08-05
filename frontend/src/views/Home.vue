@@ -80,7 +80,7 @@
                                                 </a>
                                                 <div class="product_action_box">
                                                     <ul class="list_none pr_action_btn">
-                                                        <li class="add-to-cart"><a href="#"><i
+                                                        <li class="add-to-cart"><a href="#" @click.prevent="addToCart(product.id)"><i
                                                                     class="icon-basket-loaded"></i> Add To Cart</a>
                                                         </li>
                                                         <!-- <li><a href="shop-compare.html" class="popup-ajax"><i
@@ -2150,6 +2150,7 @@
 <script setup>
 
 import { productStore } from '../stores/Product/productStore';
+import { cartStore } from '../stores/Product/cartStore';
 import { onMounted, ref } from 'vue';
 import http from '../library/http';
 import { useAuth } from '../stores/auth';
@@ -2157,14 +2158,38 @@ import Toastify from 'toastify-js';
 import { useRouter } from 'vue-router';
 
 const productStores = productStore();
+const cartStores = cartStore();
 const auth = useAuth();
 const router = useRouter();
 const allProducts = ref([]);
+const allCarts = ref([]);
 
 onMounted(async () => {
     allProducts.value = await productStores.getProduct();
     console.log(allProducts);
 });
+
+
+const addToCart = async(product_id) => {
+    if(!auth.isAuthenticated){
+        Toastify({
+
+            text: "You have to login first to add wishlist",
+
+            duration: 3000
+
+        }).showToast();
+
+
+        setTimeout(()=>{
+        router.push('/login');        
+        },1500);
+    }else{
+
+        allCarts.value = await cartStores.addCart(product_id)
+
+    }
+}
 
 const addWishlist = async(productId) => {
     if (!auth.isAuthenticated) {
