@@ -445,9 +445,8 @@ const remove = async (product_id) => {
 
         }).showToast();
 
-        setInterval(()=>{
-            window.location.reload();
-        },300)
+        // update store instead of forcing a full page reload
+        await cartStores.allCarts();
     }
 }
 
