@@ -17,7 +17,7 @@
   <div class="wishlist-wrapper">
     
     <!-- Table View when Items exist -->
-    <div v-if="wishlists.length > 0">
+    <div v-if="wishlist.wishlists.length > 0">
       <div class="wishlist-table-container">
         <table class="wishlist-table">
           <thead>
@@ -31,7 +31,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="item in wishlists" :key="item.product.id">
+            <tr v-for="item in wishlist.wishlists" :key="item.product.id">
               <td>
                 <div class="product-col">
                   <img :src="item.product.image" :alt="item.product.title" class="product-img" />
@@ -102,106 +102,36 @@
   </div>
 </template>
 
-<script setup >
+<script setup>
 import { onMounted, ref } from 'vue';
-import http from '../../library/http';
 import { useAuth } from '../../stores/auth';
-import Toastify from 'toastify-js';
+import { useWishlistStore } from '../../stores/wishlistStore';
 import { useRouter } from 'vue-router';
 
 const auth = useAuth();
-const wishlists = ref([]);
+const wishlist = useWishlistStore();
 const router = useRouter();
+const isProcessing = ref(false);
 
-onMounted( async()=>{
-
-    if(!auth.isAuthenticated){
-        Toastify({
-
-            text: "You have to login first to add or see wishlist",
-
-            duration: 3000
-
-        }).showToast();
-
-
-        setTimeout(()=>{
-        router.push('/login');        
-        },500);
-    }else{
-
-        const allWishlist = await http.get('wishlist');
-        if(allWishlist){
-        wishlists.value = allWishlist.data.data;
-        console.log(wishlists.value);
-        }else{
-        Toastify({
-
-            text: "Nothing added in your wishlist",
-
-            duration: 3000
-
-        }).showToast();           
-        }
-
-    }
-    
-} )
-
-const flush = async() =>{
-    if(!auth.isAuthenticated){
-        Toastify({
-
-            text: "Something Unauthenticated issue has been noticed",
-
-            duration: 3000
-
-        }).showToast();
-    }else{
-        const flush = await http.post('wishlist/flush');
-        console.log(flush);
-        Toastify({
-
-            text: flush.data.massage[0],
-
-            duration: 3000
-
-        }).showToast();
-        router.push('/');
-    }
-}
-
-const removeFromWishlist = async (wishlistId) => {
+onMounted(async () => {
   if (!auth.isAuthenticated) {
-    Toastify({
-      text: "Something Unauthenticated issue has been noticed",
-      duration: 3000
-    }).showToast();
+    // redirect unauthenticated users
+    router.push('/login');
     return;
   }
 
-  try {
-    const deleteWishlist = await http.post('wishlist/delete', {
-      product_id: wishlistId,
-    });
+  await wishlist.fetchAll();
+});
 
-    if (deleteWishlist) {
-      // removing product from list without reload 
-      wishlists.value = wishlists.value.filter(item => item.id !== wishlistId);
+const flush = async () => {
+  if (!auth.isAuthenticated) return;
+  await wishlist.flush();
+  router.push('/');
+};
 
-      // showing success message
-      Toastify({
-        text: deleteWishlist.data.massage || "Item removed successfully",
-        duration: 3000
-      }).showToast();
-    }
-  } catch (error) {
-    console.error("Error removing item:", error);
-    Toastify({
-      text: "Failed to remove item from wishlist",
-      duration: 3000
-    }).showToast();
-  }
+const removeFromWishlist = async (wishlistId) => {
+  if (!auth.isAuthenticated) return;
+  await wishlist.remove(wishlistId);
 };
 </script>
 
