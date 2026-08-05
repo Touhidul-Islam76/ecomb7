@@ -432,11 +432,16 @@ onMounted(async () => {
     await cartStores.allCarts();
     // cartList.value = res.value;
     console.log("cart data from header:", cartStores.allCart);
+    if(auth.isAuthenticated) {
+    await cartStores.allCarts();
+    // cartList.value = res.value;
+    console.log("cart data from header:", cartStores.allCart);
+    }
 })
 
 const remove = async (product_id) => {
     const res = await http.post('cart/delete', { cart_id: product_id })
-    if (res) {
+    if (res && auth.isAuthenticated) {
         Toastify({
 
             text: res.data.massage[0],
