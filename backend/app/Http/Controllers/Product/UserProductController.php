@@ -126,11 +126,11 @@ class UserProductController extends Controller
         }
 
 
-        if(!$availableSize->isNotEmpty() && !$availableColor->isNotEmpty()){
-            if(!ProductDetails::whereProductId($product->id)->where('color', $req->color)->where('size', $req->size)->exists()){
-                return $this->error(['color and size not available'], 400);
-            }
-        }
+        // if(!$availableSize->isNotEmpty() && !$availableColor->isNotEmpty()){
+        //     if(!ProductDetails::whereProductId($product->id)->where('color', $req->color)->where('size', $req->size)->exists()){
+        //         return $this->error(['color and size not available'], 400);
+        //     }
+        // }
 
 
         if ($product->discount && $product->discount > 0) {
