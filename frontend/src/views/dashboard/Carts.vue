@@ -213,6 +213,8 @@ const removeItem = async(product_id)=> {
             duration: 3000
 
         }).showToast();
+        // refresh cart store so UI updates immediately
+        await cartStores.allCarts();
     }
 }
 
