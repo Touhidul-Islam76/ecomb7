@@ -2156,13 +2156,14 @@ import http from '../library/http';
 import { useAuth } from '../stores/auth';
 import Toastify from 'toastify-js';
 import { useRouter } from 'vue-router';
+import { useWishlistStore } from '../stores/wishlistStore';
 
 const productStores = productStore();
 const cartStores = cartStore();
+const wishlistStores = useWishlistStore();
 const auth = useAuth();
 const router = useRouter();
 const allProducts = ref([]);
-const allCarts = ref([]);
 
 onMounted(async () => {
     allProducts.value = await productStores.getProduct();
@@ -2184,10 +2185,9 @@ const addToCart = async(product_id) => {
         setTimeout(()=>{
         router.push('/login');        
         },1500);
-    }else{
-
-        allCarts.value = await cartStores.addCart(product_id)
-
+    } else {
+        // addCart now refreshes the cart store internally
+        await cartStores.addCart(product_id);
     }
 }
 
@@ -2206,20 +2206,8 @@ const addWishlist = async(productId) => {
         router.push('/login');        
         },1500);
 
-    }else{
-        const wishlistResponse = await http.post('wishlist/add',{
-            product_id: productId,
-        })
-
-        Toastify({
-
-            text: wishlistResponse.data.massage[0],
-
-            duration: 3000
-
-        }).showToast();        
-
-
+    } else {
+        await wishlistStores.add(productId);
     }
 }
 
