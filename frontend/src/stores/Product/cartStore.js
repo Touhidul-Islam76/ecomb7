@@ -50,19 +50,6 @@ export const cartStore = defineStore("cartStore", {
         this.message = "SOmething went wrong";
       }
     },
-    // async remove(product) {
-    //   try {
-    //     const res = await http.post("cart/delete", { cart_id: product });
-    //     if (res) {
-    //       Toastify({
-    //         text: res.data.massage[0],
 
-    //         duration: 1000,
-    //       }).showToast();
-    //     }
-    //   } catch (e) {
-    //     this.message = "something went wrong";
-    //   }
-    // },
   },
 });
