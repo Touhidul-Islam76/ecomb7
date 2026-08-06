@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import http from "../../library/http";
 import Toastify from "toastify-js";
+import router from "../../router";
 
 export const cartStore = defineStore("cartStore", {
   state: () => ({
@@ -50,6 +51,25 @@ export const cartStore = defineStore("cartStore", {
         this.message = "SOmething went wrong";
       }
     },
+
+    async allCartDelete(){
+      try{
+        const res = await http.post("/cart/flush");
+        if(res){
+          this.allCart = [];
+          Toastify({
+            text: res.data.massage ? res.data.massage[0] : 'Added to cart',
+            duration: 2000,
+          }).showToast();
+
+          setTimeout(() => {
+            router.push('/')
+          },500);
+        }
+      }catch(e){
+        this.message = "Something went wrong";
+      }
+    }
 
   },
 });
