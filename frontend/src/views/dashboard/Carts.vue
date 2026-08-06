@@ -218,6 +218,10 @@ const removeItem = async(product_id)=> {
     }
 }
 
+const clearCart = async()=>{
+    await cartStores.allCartDelete();
+}
+
 
 const couponCode = ref('');
 const selectedCountry = ref('BD');
@@ -232,14 +236,13 @@ const selectedCountry = ref('BD');
 //     return subtotal.value;
 // });
 
-const increaseQty = (item) => {
-    item.quantity++;
+const decreaseQty = (item) => {
+    const check = Number(item.quantity || 0) - 1;
+    item.quantity = check < 1 ? 1 : check; 
 };
 
-const decreaseQty = (item) => {
-    if (item.quantity > 1) {
-        item.quantity--;
-    }
+const increaseQty = (item) => {
+    item.quantity = Number(item.quantity || 0) + 1;
 };
 
 // const removeItem = (id) => {
