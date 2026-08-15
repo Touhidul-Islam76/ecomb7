@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->string('email')->unique()->nullable();
+            $table->enum('type', ['customer', 'admin'])->default('customer');
             $table->integer('otp')->nullable();
             $table->string('password')->nullable();
             $table->timestamps();
