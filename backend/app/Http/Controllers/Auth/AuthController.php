@@ -16,10 +16,11 @@ class AuthController extends Controller
         $otp = rand(0000,9999);
 
         if(!$user){
-            User::create([
+            $user = User::create([
                 'email' => $req->email,
                 'otp' => $otp,
             ]);
+            $user->assignRole('customer');
         }
         else{
             $user->update([

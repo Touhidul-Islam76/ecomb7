@@ -9,10 +9,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use Spatie\Permission\Traits\HasRoles;
+
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    // HasRoles is a trait provided by the Spatie Laravel Permission package that allows you to manage user permissions and roles in your application. By using this trait, you can easily assign permissions to users, check if a user has a specific permission, and manage roles and permissions in a more organized way.
+    use HasFactory, Notifiable, HasApiTokens, HasRoles, HasRoles;
 
     /**
      * The attributes that are mass assignable.
