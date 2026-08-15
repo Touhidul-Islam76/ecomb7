@@ -5,6 +5,7 @@ use App\Http\Controllers\Brand\BrandController;
 use App\Http\Controllers\Category\CategoryController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\UserProductController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,12 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('delete', [UserProductController::class, 'removeCart'])->name('delete');
             Route::post('flush', [UserProductController::class, 'flushCart'])->name('flush');
         });
+    });
+
+
+
+    Route::group(['middleware' => 'auth:sanctum'], function () {
+        Route::apiResource('users', UserController::class);
     });
 
 
