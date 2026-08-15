@@ -9,6 +9,7 @@ use App\Models\User;
 use Database\Factories\BrandFactory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,12 +20,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+                // Customers
+        User::factory()->count(19)->create([
+            'type' => 'customer',
+        ]);
+
+        // Admin
+        User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'type' => 'admin',
+            'password' => Hash::make('password'),
+        ]);
+
         Brand::factory(10)->create();
         Category::factory(10)->create();
         Product::factory(100)->create();
