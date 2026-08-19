@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\CreateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -31,4 +32,21 @@ class UserController extends Controller
             ]
         ]);
     }
+
+    public function me( Request $request ){
+        $user = Auth::user();
+
+        if(!$user){
+            return $this->error(['User not found'], 404);
+        }else{
+
+            return $this->success([
+                'user' => $this->formatUser($user)
+            ]);
+        }
+
+
+    }
+
+    public function index(){}
 }
