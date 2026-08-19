@@ -429,7 +429,6 @@ const cartList = ref([]);
 // const message = auth.message;
 
 onMounted(async () => {
-    await cartStores.allCarts();
     // cartList.value = res.value;
     console.log("cart data from header:", cartStores.allCart);
     if(auth.isAuthenticated) {
