@@ -19,134 +19,222 @@ export const useAuth = defineStore("auth", {
   },
 
   actions: {
+    // =========================
+    // SEND OTP
+    // =========================
     async sendOtp(email) {
       this.sending = true;
-      this.message = ""; // clearing old messages
+      this.message = "";
+
       try {
-        const response = await http.post("login/otpSend", { email });
+        const response = await http.post("login/otpSend", {
+          email: email,
+        });
 
-        console.log("OTP Send Response:", response); // checking response structure in console
+        console.log("OTP Send Response:", response);
 
+        // Save email
+        this.email = email;
+        sessionStorage.setItem("email", email);
 
-        if (response) {
-          this.email = email;
-          sessionStorage.setItem("email", email); // setting email value in sessionStorage
-          
+        // Backend response:
+        // {
+        //   data: null,
+        //   massage: ["OTP successfully sent to your email"],
+        //   code: 200
+        // }
 
-          // getting message from response
-          const apiMessage = response.data.data.massage ;
- 
-          if (Array.isArray(apiMessage)) {
-            this.message = apiMessage[0];
-          } else {
-            this.message = "OTP Sent Successfully";
-          }
+        const apiMessage = response.data?.massage;
+
+        if (Array.isArray(apiMessage) && apiMessage.length > 0) {
+          this.message = apiMessage[0];
+        } else {
+          this.message = "OTP successfully sent to your email";
         }
+
+        return true;
       } catch (error) {
         console.error("OTP send error:", error);
+
         this.message =
-          error.response?.data?.massage?.[0] || "Failed to send OTP";
+          error.response?.data?.massage?.[0] ||
+          "Failed to send OTP";
+
+        return false;
       } finally {
         this.sending = false;
       }
     },
 
+    // =========================
+    // VERIFY OTP / LOGIN
+    // =========================
     async verifyOtp(otps) {
       this.verifying = true;
       this.message = "";
+
       try {
+        const email = sessionStorage.getItem("email");
+
+        if (!email) {
+          this.message = "Email not found. Please send OTP again.";
+          return false;
+        }
+
         const response = await http.post("login", {
-          email: sessionStorage.getItem("email"),
+          email: email,
           otp: otps,
         });
 
-        if (response && response.data) {
-          sessionStorage.clear();
+        console.log("OTP Verify Response:", response);
 
-          // the token is inside of response.data.accessToken
-          this.access_token = response.data.data.accessToken;
-          localStorage.setItem("access_token", this.access_token);
+        // Check successful response
+        if (response?.data?.data) {
+          const accessToken = response.data.data.accessToken;
+          const user = response.data.data.user;
 
-          // this.message = "Login success";
-                    // getting message from response
-          const apiMessage = response.massage || response.data?.massage;
+          // Save token
+          this.access_token = accessToken;
 
-          if (Array.isArray(apiMessage)) {
+          localStorage.setItem(
+            "access_token",
+            accessToken
+          );
+
+          // Save user
+          localStorage.setItem(
+            "user",
+            JSON.stringify(user)
+          );
+
+          // Get backend message
+          const apiMessage = response.data?.massage;
+
+          if (Array.isArray(apiMessage) && apiMessage.length > 0) {
             this.message = apiMessage[0];
           } else {
-            this.message = "OTP Sent Successfully";
+            this.message = "Login successful";
           }
 
+          // Clear temporary email/OTP session
+          sessionStorage.removeItem("email");
 
-          // re-directing to the dashboard page after 1.2 seconds  
-          // refresh other stores (cart, wishlist) so UI immediately reflects logged-in state
+          // =========================
+          // REFRESH CART
+          // =========================
           try {
             const cstore = cartStore();
+
             if (cstore) {
-              // cstore.access_token = this.access_token;
               await cstore.allCarts();
             }
-          } catch (e) {
-            console.error('Failed to refresh cart store after login', e);
+          } catch (error) {
+            console.error(
+              "Failed to refresh cart after login:",
+              error
+            );
           }
 
+          // =========================
+          // REFRESH WISHLIST
+          // =========================
           try {
             const wstore = useWishlistStore();
-            if (wstore && typeof wstore.fetchAll === 'function') {
+
+            if (
+              wstore &&
+              typeof wstore.fetchAll === "function"
+            ) {
               await wstore.fetchAll();
             }
-          } catch (e) {
-            console.error('Failed to refresh wishlist store after login', e);
+          } catch (error) {
+            console.error(
+              "Failed to refresh wishlist after login:",
+              error
+            );
           }
 
+          // Redirect to dashboard
           setTimeout(() => {
-            router.push('/dashboard/my-account')
-          },1200);
+            router.push("/dashboard/my-account");
+          }, 1200);
 
-          
-
-          // will be redirected to dashboard after login
-          // router.push({ name: 'Dashboard' });
-        } else {
-          this.message = "Something went wrong. Please try again";
+          return true;
         }
+
+        this.message =
+          response.data?.massage?.[0] ||
+          "Something went wrong. Please try again.";
+
+        return false;
+
       } catch (error) {
-        this.message = error.response?.data?.massage[0] || "Invalid OTP";
+        console.error("OTP verification error:", error);
+
+        this.message =
+          error.response?.data?.massage?.[0] ||
+          "Invalid OTP";
+
+        return false;
+
       } finally {
         this.verifying = false;
       }
     },
-    logout(){
-      // remove token
+
+    // =========================
+    // LOGOUT
+    // =========================
+    logout() {
+      // Remove token
       localStorage.removeItem("access_token");
+
+      // Remove user
+      localStorage.removeItem("user");
+
+      // Reset auth state
       this.access_token = null;
+      this.email = "";
+      this.otp = "";
       this.message = "Logout successful";
 
-      // clear cart store state so UI updates immediately after logout
+      // =========================
+      // CLEAR CART
+      // =========================
       try {
         const cstore = cartStore();
+
         if (cstore) {
           cstore.allCart = [];
           cstore.access_token = null;
         }
-      } catch (e) {
-        console.error('Failed to clear cart store on logout', e);
+      } catch (error) {
+        console.error(
+          "Failed to clear cart store on logout:",
+          error
+        );
       }
 
-      // clear wishlist store state as well
+      // =========================
+      // CLEAR WISHLIST
+      // =========================
       try {
         const wstore = useWishlistStore();
+
         if (wstore) {
           wstore.wishlists = [];
         }
-      } catch (e) {
-        console.error('Failed to clear wishlist store on logout', e);
+      } catch (error) {
+        console.error(
+          "Failed to clear wishlist store on logout:",
+          error
+        );
       }
 
+      // Redirect to login
       setTimeout(() => {
         router.push("/login");
       }, 1200);
-
     },
   },
 });
