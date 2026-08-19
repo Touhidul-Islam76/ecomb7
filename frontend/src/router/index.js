@@ -6,6 +6,7 @@ import MyAccount from "../views/dashboard/MyAccount.vue";
 import { useAuth } from "../stores/auth.js";
 import Wishlist from "../views/dashboard/Wishlist.vue";
 import Carts from "../views/dashboard/Carts.vue";
+import AdminLogin from "../views/Admin/AdminLogin.vue";
 
 // defining the routes where components will be shown
 const routes = [
@@ -40,6 +41,10 @@ const routes = [
     // this meta:{ requireAuth:true } is for that page which is secured and accesable only for the logged in users
     meta: { requireAuth: true },
   },
+  {
+    path:"/admin/login",
+    component: AdminLogin,
+  }
 ];
 
 const router = createRouter({
