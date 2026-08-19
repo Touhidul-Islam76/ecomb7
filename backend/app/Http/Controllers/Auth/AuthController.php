@@ -47,8 +47,10 @@ class AuthController extends Controller
 
         $accessToken = $user->createToken('authToken')->plainTextToken;
 
+
         return $this->success([
             'accessToken' => $accessToken,
+            'user' => $this->formatUser($user)
         ],['Login Success']);
     }
 }
