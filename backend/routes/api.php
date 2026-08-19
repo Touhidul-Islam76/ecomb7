@@ -42,6 +42,8 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('delete', [UserProductController::class, 'removeCart'])->name('delete');
             Route::post('flush', [UserProductController::class, 'flushCart'])->name('flush');
         });
+
+        Route::get('me', [UserController::class, 'me']);
     });
 
 
