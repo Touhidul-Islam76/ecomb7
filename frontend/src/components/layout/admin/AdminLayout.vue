@@ -7,7 +7,7 @@
       </div>
       <div class="d-flex align-items-center gap-2">
         <a class="btn btn-outline-secondary btn-sm" href="index.html" role="button">View site</a>
-        <button class="btn btn-outline-danger btn-sm" type="button">Logout</button>
+        <button  class="btn btn-outline-danger btn-sm" type="button" @click="logout">Logout</button>
       </div>
     </div>
   </header>
@@ -50,18 +50,47 @@
 </template>
 
 <script setup>
- 
+import { useAuth } from '../../../stores/auth';
+import { useRouter } from 'vue-router';
+const auth = useAuth();
+const router = useRouter();
+
+const logout = async() =>{
+  await auth.logout();
+  router.push("/admin/login");
+
+}
 </script>
 
 <style>
+.admin-wrap {
+  padding: 2.5rem 0;
+}
 
-  .admin-wrap { padding: 2.5rem 0; }
-  .sidebar { min-width: 220px; }
-  .stat { padding: 1rem; }
-  .table-actions { min-width: 140px; }
-  .muted-small { color: #6c757d; font-size: .9rem; }
-  @media (max-width: 767px) {
-    .sidebar { order: 2; }
-    .main { order: 1; }
+.sidebar {
+  min-width: 220px;
+}
+
+.stat {
+  padding: 1rem;
+}
+
+.table-actions {
+  min-width: 140px;
+}
+
+.muted-small {
+  color: #6c757d;
+  font-size: .9rem;
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    order: 2;
   }
+
+  .main {
+    order: 1;
+  }
+}
 </style>
