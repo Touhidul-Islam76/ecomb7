@@ -1,8 +1,10 @@
 import { defineStore } from "pinia";
 import http from "../library/http";
-import router from "../router";
+
 import { cartStore } from "./Product/cartStore";
 import { useWishlistStore } from "./wishlistStore";
+import Toastify from "toastify-js";
+import router from "../router";
 
 export const useAuth = defineStore("auth", {
   state: () => ({
@@ -12,6 +14,7 @@ export const useAuth = defineStore("auth", {
     message: "",
     verifying: false,
     otp: "",
+    user:localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null,
   }),
 
   getters: {
@@ -57,8 +60,7 @@ export const useAuth = defineStore("auth", {
         console.error("OTP send error:", error);
 
         this.message =
-          error.response?.data?.massage?.[0] ||
-          "Failed to send OTP";
+          error.response?.data?.massage?.[0] || "Failed to send OTP";
 
         return false;
       } finally {
@@ -96,16 +98,10 @@ export const useAuth = defineStore("auth", {
           // Save token
           this.access_token = accessToken;
 
-          localStorage.setItem(
-            "access_token",
-            accessToken
-          );
+          localStorage.setItem("access_token", accessToken);
 
           // Save user
-          localStorage.setItem(
-            "user",
-            JSON.stringify(user)
-          );
+          localStorage.setItem("user", JSON.stringify(user));
 
           // Get backend message
           const apiMessage = response.data?.massage;
@@ -129,10 +125,7 @@ export const useAuth = defineStore("auth", {
               await cstore.allCarts();
             }
           } catch (error) {
-            console.error(
-              "Failed to refresh cart after login:",
-              error
-            );
+            console.error("Failed to refresh cart after login:", error);
           }
 
           // =========================
@@ -141,17 +134,11 @@ export const useAuth = defineStore("auth", {
           try {
             const wstore = useWishlistStore();
 
-            if (
-              wstore &&
-              typeof wstore.fetchAll === "function"
-            ) {
+            if (wstore && typeof wstore.fetchAll === "function") {
               await wstore.fetchAll();
             }
           } catch (error) {
-            console.error(
-              "Failed to refresh wishlist after login:",
-              error
-            );
+            console.error("Failed to refresh wishlist after login:", error);
           }
 
           // Redirect to dashboard
@@ -167,16 +154,12 @@ export const useAuth = defineStore("auth", {
           "Something went wrong. Please try again.";
 
         return false;
-
       } catch (error) {
         console.error("OTP verification error:", error);
 
-        this.message =
-          error.response?.data?.massage?.[0] ||
-          "Invalid OTP";
+        this.message = error.response?.data?.massage?.[0] || "Invalid OTP";
 
         return false;
-
       } finally {
         this.verifying = false;
       }
@@ -209,10 +192,7 @@ export const useAuth = defineStore("auth", {
           cstore.access_token = null;
         }
       } catch (error) {
-        console.error(
-          "Failed to clear cart store on logout:",
-          error
-        );
+        console.error("Failed to clear cart store on logout:", error);
       }
 
       // =========================
@@ -225,16 +205,58 @@ export const useAuth = defineStore("auth", {
           wstore.wishlists = [];
         }
       } catch (error) {
-        console.error(
-          "Failed to clear wishlist store on logout:",
-          error
-        );
+        console.error("Failed to clear wishlist store on logout:", error);
       }
 
       // Redirect to login
       setTimeout(() => {
         router.push("/login");
       }, 1200);
+    },
+
+    async checkAuth(otps) {
+      const res = await http.post("login", {
+        email: sessionStorage.getItem("email"),
+        otp: otps,
+      });
+
+      const response = res.data.data;
+
+      if (response) {
+        console.log("adminlogin =", res.data.data);
+
+        sessionStorage.removeItem("email");
+        this.access_token = response.accessToken;
+        localStorage.setItem("access_token", response.accessToken);
+
+        const user = response.user;
+        const isAdmin =
+          user.role === "admin" ||
+          (Array.isArray(user.roles) && user.roles.includes("admin"));
+
+        // Save user
+        localStorage.setItem("user", JSON.stringify(user));
+
+        if (isAdmin) {
+          Toastify({
+            text: "Login successful",
+            duration: 3000,
+          }).showToast();
+          // setTimeout(() => {
+          //   router.push("/admin/dashboard-acc");
+          // }, 1500);
+
+          router.push("/admin/dashboard-acc");
+        } else {
+          Toastify({
+            text: "Access denied. You are not an admin.",
+            duration: 3000,
+          }).showToast();
+          setTimeout(() => {
+            router.push("/admin/login");
+          }, 1500);
+        }
+      }
     },
   },
 });
