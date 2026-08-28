@@ -27,7 +27,7 @@ class UserController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->getRoleNames()->first(),
-                'password' => $user->password,
+                'password' => $request->password,
                 'permissions' => $user->getAllPermissions()->pluck('name'),
             ]
         ]);
