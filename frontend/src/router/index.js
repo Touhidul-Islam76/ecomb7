@@ -7,6 +7,7 @@ import { useAuth } from "../stores/auth.js";
 import Wishlist from "../views/dashboard/Wishlist.vue";
 import Carts from "../views/dashboard/Carts.vue";
 import AdminLogin from "../views/Admin/AdminLogin.vue";
+import AdminDashboard from "../views/Admin/AdminDashboard.vue";
 
 // defining the routes where components will be shown
 const routes = [
@@ -44,6 +45,10 @@ const routes = [
   {
     path:"/admin/login",
     component: AdminLogin,
+  },{
+    path: "/admin/dashboard-acc",
+    component: AdminDashboard,
+    meta: { requireAuth: true },
   }
 ];
 
