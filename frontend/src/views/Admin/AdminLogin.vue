@@ -7,27 +7,33 @@
 
           <p class="note mb-3">This is a static demo login. Replace with server-side authentication in production.</p>
 
-          <form>
+          <form @submit.prevent="handleSendOtp">
             <div class="mb-3">
               <label for="adminEmail" class="form-label small">Email</label>
-              <input 
-                id="adminEmail"
-                type="email" 
-                class="form-control" 
-                placeholder="admin@example.com" 
+              <input id="adminEmail" v-model="email" type="email" class="form-control" placeholder="admin@example.com"
                 required>
             </div>
 
-            <!-- OTP input (Static Display) -->
+
+
+
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">
+                Send OTP
+              </button>
+            </div>
+          </form>
+
+
+          <form @submit.prevent="handleVerifyOtp">
             <div class="mb-3">
-              <label for="adminOtp" class="form-label small">OTP</label>
-              <input 
-                id="adminOtp"
-                type="text" 
-                class="form-control" 
-                placeholder="Enter the otp" 
+              <label for="adminEmail" class="form-label small">Otp</label>
+              <input id="adminEmail" type="text" v-model="otps" class="form-control" placeholder="admin@example.com"
                 required>
             </div>
+
+
 
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div class="form-check">
@@ -38,14 +44,11 @@
             </div>
 
             <div class="d-grid">
-              <button 
-                type="button" 
-                class="btn btn-primary">
-                Verify and Login
+              <button type="submit" class="btn btn-primary">
+                Verify otp
               </button>
             </div>
           </form>
-
           <hr class="my-3">
 
           <div class="small text-muted text-center">
@@ -58,5 +61,33 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import { useAuth } from '../../stores/auth';
+import Toastify from "toastify-js";
+import http from '../../library/http';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const auth = useAuth();
+const email = ref('');
+const otps = ref('');
+
+const handleSendOtp = async () => {
+  const res = await auth.sendOtp(email.value);
+
+  if (res) {
+    Toastify({
+      text: auth.message,
+      duration: 3000,
+    }).showToast();
+
+
+  }
+
+};
+
+const handleVerifyOtp = async () => {
+  await auth.checkAuth(otps.value);
+};
 
 </script>
