@@ -25,12 +25,13 @@
           </div>
 
           <nav class="list-group mt-3">
-            <a href="#" class="list-group-item list-group-item-action active">Dashboard</a>
-            <a href="#" class="list-group-item list-group-item-action">Users</a>
-            <a href="#" class="list-group-item list-group-item-action">Orders</a>
-            <a href="#" class="list-group-item list-group-item-action">Categories</a>
-            <a href="#" class="list-group-item list-group-item-action">Products</a>
-            <a href="#" class="list-group-item list-group-item-action">Settings</a>
+            <router-link to="/admin/dashboard-acc" class="list-group-item list-group-item-action" active-class="active" v-if="auth.hasPermission('view dashboard')">Dashboard</router-link>
+            <router-link to="/admin/users" class="list-group-item list-group-item-action" active-class="active" v-if="auth.hasPermission('manage users')">Users</router-link>
+            <router-link to="/admin/orders" class="list-group-item list-group-item-action" active-class="active" v-if="auth.hasPermission('manage orders')">Orders</router-link>
+            <router-link to="/admin/categories" class="list-group-item list-group-item-action" active-class="active" v-if="auth.hasPermission('manage categories')">Categories</router-link>
+            <router-link to="/admin/products" class="list-group-item list-group-item-action" active-class="active" v-if="auth.hasPermission('manage products')">Products</router-link>
+            <router-link to="/admin/settings" class="list-group-item list-group-item-action" active-class="active" v-if="auth.hasPermission('manage settings')">Settings</router-link>
+            
           </nav>
         </aside>
 
@@ -52,6 +53,7 @@
 <script setup>
 import { useAuth } from '../../../stores/auth';
 import { useRouter } from 'vue-router';
+
 const auth = useAuth();
 const router = useRouter();
 
