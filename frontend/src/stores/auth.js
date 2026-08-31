@@ -19,6 +19,15 @@ export const useAuth = defineStore("auth", {
 
   getters: {
     isAuthenticated: (check) => !!check.access_token,
+    isAdmin: (check) => check.user?.role === 'admin' || (Array.isArray(check.user?.roles) && check.user.roles.includes('admin')),
+    hasPermission: (check)=>{
+      return (permission) => {
+        if (!check.user || !check.user.permissions) {
+          return false;
+        }
+        return check.user.permissions.includes(permission);
+      }
+    }
   },
 
   actions: {
