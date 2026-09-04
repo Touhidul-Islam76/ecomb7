@@ -1,171 +1,269 @@
 <template>
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Users</h3>
-        <div class="muted-small">As this is a static demo there is no live data.</div>
+        <h3 class="mb-0">Users List</h3>
+        <button @click="showForm" type="button" class="btn btn-secondary">{{ editId ? 'Edit' : 'Create' }} User</button>
     </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="card stat text-center">
-                <div class="muted-small">Total Orders</div>
-                <div class="h4 mt-2">128</div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card stat text-center">
-                <div class="muted-small">Revenue (YTD)</div>
-                <div class="h4 mt-2">$14,520</div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card stat text-center">
-                <div class="muted-small">Active Customers</div>
-                <div class="h4 mt-2">342</div>
-            </div>
-        </div>
-    </div>
+    <form v-if="isFormVisible" @submit.prevent="submitForm">
+        <div class="mb-2">
+            <label for="exampleInputEmail1" class="form-label">Name</label>
+            <input type="text" placeholder="Enter name" class="form-control" id="exampleInputEmail1"
+                aria-describedby="emailHelp" v-model="form.name">
 
-    <!-- Orders list (static) -->
-    <div class="card mb-4" id="orders">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Recent Orders</h5>
-                <a class="small" href="orders.html">See all</a>
-            </div>
+        </div>
+        <div class="mb-2">
+            <label for="exampleInputEmail1" class="form-label">Email address</label>
+            <input type="email" placeholder="Enter email" class="form-control" id="exampleInputEmail1"
+                aria-describedby="emailHelp" v-model="form.email">
 
+        </div>
+        <div class="mb-2">
+            <label for="exampleInputEmail1" class="form-label">role</label>
+
+
+            <select class="form-select" aria-label="Default select example" v-model="form.role">
+                <option value="" v-if="!editId" disabled selected>Select Role</option>
+                <option v-for="role in userRoles" :key="role.id" :value="role.name">{{ role.name }}</option>
+            </select>
+
+        </div>
+        <div class="mb-2">
+            <label for="exampleInputPassword1" class="form-label">Password</label>
+            <input type="password" placeholder="Enter password" class="form-control" id="exampleInputPassword1"
+                v-model="form.password">
+        </div>
+
+        <div class="mb-3 d-flex justify-content-end align-items-center gap-2">
+            <button type="submit" class="btn btn-primary">{{ editId ? 'Update' : 'Create' }} User</button>
+            <button type="button" class="btn btn-danger" @click="closeForm">Close form</button>
+        </div>
+
+    </form>
+
+    <div class="card mb-4" id="users-list">
+        <div class="card-body " max-height="400px" style="max-height: 350px; overflow-y: auto;">
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>Order</th>
-                            <th>Customer</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th class="text-end">Total</th>
+                            <th>SI</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th class="text-end">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>#1009</td>
-                            <td>Jane Doe</td>
-                            <td>2025-11-15</td>
-                            <td><span class="badge bg-success">Delivered</span></td>
-                            <td class="text-end">$59.00</td>
+                        <tr v-if="users.length > 0" v-for="(user, index) in users" :key="user.id">
+                            <td>{{ index + 1 }}</td>
+                            <td>{{ user.name || 'N/A' }}</td>
+                            <td>{{ user.email }}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-primary me-2" @click="editUser(user)">Edit</button>
+
+                                <!-- if method added so that the current user cannot delete their own account -->
+                                <button class="btn btn-sm btn-danger" v-if="auth.user.id !== user.id" @click="deleteUser(user)">Delete</button>
+                            </td>
                         </tr>
-                        <tr>
-                            <td>#1010</td>
-                            <td>Tom Smith</td>
-                            <td>2025-11-16</td>
-                            <td><span class="badge bg-warning">Processing</span></td>
-                            <td class="text-end">$22.00</td>
-                        </tr>
-                        <tr>
-                            <td>#1011</td>
-                            <td>Alice Lee</td>
-                            <td>2025-11-17</td>
-                            <td><span class="badge bg-danger">Cancelled</span></td>
-                            <td class="text-end">$0.00</td>
+
+                        <tr v-else>
+                            <td colspan="4" class="text-center">No users found.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
-    <!-- Products preview (static) -->
-    <div class="card mb-4" id="products">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Top Products</h5>
-                <a class="small" href="products.html">Manage products</a>
-            </div>
-
-            <div class="row row-cols-1 row-cols-md-3 g-3">
-                <div class="col">
-                    <div class="card h-100">
-                        <img src="https://placehold.co/400x260?text=Product+A" class="card-img-top" alt="Product A"
-                            style="height:140px; object-fit:cover;">
-                        <div class="card-body">
-                            <h6 class="card-title mb-1">Product A</h6>
-                            <p class="mb-0 muted-small">$22.00 • 45 sold</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card h-100">
-                        <img src="https://placehold.co/400x260?text=Product+B" class="card-img-top" alt="Product B"
-                            style="height:140px; object-fit:cover;">
-                        <div class="card-body">
-                            <h6 class="card-title mb-1">Product B</h6>
-                            <p class="mb-0 muted-small">$32.00 • 30 sold</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card h-100">
-                        <img src="https://placehold.co/400x260?text=Product+C" class="card-img-top" alt="Product C"
-                            style="height:140px; object-fit:cover;">
-                        <div class="card-body">
-                            <h6 class="card-title mb-1">Product C</h6>
-                            <p class="mb-0 muted-small">$42.00 • 20 sold</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Customers preview (static) -->
-    <div class="card mb-4" id="customers">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Recent Customers</h5>
-                <a class="small" href="customers.html">Manage</a>
-            </div>
-
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>Jane Doe</strong>
-                        <div class="muted-small">jane@example.com</div>
-                    </div>
-                    <div class="muted-small">Joined 2025-10-01</div>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>Tom Smith</strong>
-                        <div class="muted-small">tom@example.com</div>
-                    </div>
-                    <div class="muted-small">Joined 2025-09-12</div>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Settings preview -->
-    <div class="card" id="settings">
-        <div class="card-body">
-            <h5 class="card-title">Store settings</h5>
-            <p class="muted-small mb-3">Basic settings are editable in the real admin panel. This static demo shows
-                where settings would live.</p>
-
-            <div class="row">
-                <div class="col-md-6 mb-2">
-                    <label class="form-label small">Store name</label>
-                    <input class="form-control form-control-sm" value="SimpleShop Demo" readonly>
-                </div>
-                <div class="col-md-6 mb-2">
-                    <label class="form-label small">Default currency</label>
-                    <input class="form-control form-control-sm" value="USD" readonly>
-                </div>
-            </div>
-        </div>
-    </div>
 </template>
 
 <script setup>
+import Toastify from 'toastify-js';
+import { onMounted, ref } from 'vue';
+import http from '../../library/http';
+import { useAuth } from '../../stores/auth';
 
+const users = ref([]);
+const auth = useAuth();
+const userRoles = ref([]);
+const editId = ref('');
+const isFormVisible = ref(false);
+const form = ref({
+    name: '',
+    email: '',
+    role: '',
+    password: ''
+});
+
+// to visible the form
+const showForm = () => {
+    isFormVisible.value = true;
+}
+
+// to close the form and reset the form data
+const closeForm = () => {
+    editId.value = '';
+    isFormVisible.value = false;
+    form.value = {
+        name: '',
+        email: '',
+        role: '',
+        password: ''
+    }
+}
+
+// edit the user data
+const editUser = (user) => {
+    isFormVisible.value = true;
+    editId.value = user.id;
+    form.value = {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        password: user.password
+    }
+}
+
+const submitForm = async () => {
+    if (editId.value) {
+        const newUser = {
+            name: form.value.name,
+            email: form.value.email,
+            role: form.value.role,
+            password: form.value.password
+        }
+
+        try {
+            const updateUser = await http.put(`/users/${editId.value}`, newUser);
+
+            if (updateUser) {
+                Toastify({
+                    text: updateUser.data.massage[0] || 'User update successful',
+                    duration: 3000
+                }).showToast();
+
+                // reset the form
+                form.value = {
+                    name: '',
+                    email: '',
+                    role: '',
+                    password: ''
+                }
+                // close the form
+                isFormVisible.value = false;
+                editId.value = '';
+                // console.log('updated user:-', updateUser.data);
+
+                // const response = await http.get('/users');
+                // users.value = response.data.data;
+                const updatedUser = updateUser?.data?.data?.user ?? null;
+
+                if (updatedUser) {
+                    const index = users.value.findIndex(user => user.id === updatedUser.id);
+                    if (index !== -1) {
+                        users.value[index] = updatedUser;
+                    }
+                }
+            }
+
+
+        } catch (err) {
+
+        }
+    } else {
+        try {
+
+            const newUser = {
+                name: form.value.name,
+                email: form.value.email,
+                role: form.value.role,
+                password: form.value.password
+            }
+
+            const createUser = await http.post('/users', {
+                name: form.value.name,
+                email: form.value.email,
+                role: form.value.role,
+                password: form.value.password
+            });
+            if (createUser) {
+                Toastify({
+                    text: createUser.data.massage[0] || 'User create successful',
+                    duration: 3000
+                }).showToast();
+
+                // reset the form
+                form.value = {
+                    name: '',
+                    email: '',
+                    role: '',
+                    password: ''
+                }
+                // close the form
+                isFormVisible.value = false;
+                console.log('new user:-', createUser.data);
+
+                // users.value.push(createUser.data.data.user);
+
+                const response = await http.get('/users');
+                users.value = response.data.data;
+
+
+
+
+            }
+        } catch (error) {
+            Toastify({
+                text: 'Failed to create user',
+                duration: 3000
+            }).showToast();
+        }
+
+    }
+}
+
+
+const deleteUser = async (user) => {
+    try {
+        if (!confirm("Are you sure you want to delete this use?")) {
+            return;
+        } else {
+            const response = await http.delete(`/users/${user.id}`);
+            if (response) {
+                Toastify({
+                    text: response.data.massage[0] || 'User delete successful',
+                    duration: 3000
+                }).showToast();
+
+                // remove the user from the users array
+                users.value = users.value.filter(u => u.id !== user.id);
+            }
+        }
+
+    } catch (error) {
+        Toastify({
+            text: error.response.data.message || 'Failed to delete user',
+            duration: 3000
+        }).showToast();
+    }
+}
+
+onMounted(async () => {
+    try {
+        const response = await http.get('/users');
+        const allRoles = await http.get('/roles');
+        // console.log('user data:- ', response.data.data);
+        // console.log('user roles:- ', allRoles.data.data);
+        userRoles.value = allRoles.data.data;
+        users.value = response.data.data;
+    } catch (error) {
+        Toastify({
+
+            text: error.response.data.message || 'Failed to fetch users',
+
+            duration: 3000
+
+        }).showToast();
+    }
+});
 </script>
+
 <style scoped></style>
