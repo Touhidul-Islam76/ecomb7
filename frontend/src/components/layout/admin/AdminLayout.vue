@@ -20,7 +20,7 @@
           <div class="card">
             <div class="card-body">
               <h6 class="mb-1">Administrator</h6>
-              <p class="mb-0 muted-small">admin@example.com</p>
+              <p class="mb-0 muted-small">{{ auth.user.name || 'N/A' }} ({{ auth.user.email }})</p>
             </div>
           </div>
 
