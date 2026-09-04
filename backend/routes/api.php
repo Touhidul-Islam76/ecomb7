@@ -48,8 +48,9 @@ Route::group(['prefix' => 'v1'], function () {
 
 
 
-    Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {
         Route::apiResource('users', UserController::class);
+        Route::get('roles', [UserController::class, 'allRoles']);
     });
 
 
