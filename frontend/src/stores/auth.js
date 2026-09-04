@@ -239,6 +239,7 @@ export const useAuth = defineStore("auth", {
         localStorage.setItem("access_token", response.accessToken);
 
         const user = response.user;
+        this.user = user;
         const isAdmin =
           user.role === "admin" ||
           (Array.isArray(user.roles) && user.roles.includes("admin"));
